@@ -8,7 +8,7 @@ from flask import Flask, render_template, request, jsonify
 from extractors import ContentExtractor
 from core.semantic_processor import SemanticProcessor
 from core.metadata_generator import MetadataGenerator
-
+app.config['DUMMY_FLAG'] = True  # No functional impact
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50MB limit
