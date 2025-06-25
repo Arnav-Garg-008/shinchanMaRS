@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Amit Meena</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #f0f2f5, #e0f7fa);
+      color: #333;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      padding: 2rem;
+      background: #ffffff;
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    header h1 {
+      font-size: 2.5rem;
+      color: #0077b6;
+    }
+
+    header p {
+      color: #555;
+    }
+
+    .upload-container {
+      margin-bottom: 2rem;
+    }
+
+    #drop-zone {
+      padding: 2rem;
+      border: 2px dashed #00b4d8;
+      border-radius: 15px;
+      text-align: center;
+      background-color: #f0f9ff;
+      transition: 0.3s;
+    }
+
+    #drop-zone.highlight {
+      border-color: #0077b6;
+      background-color: #e0f7fa;
+    }
+
+    .upload-icon {
+      font-size: 3rem;
+      color: #0077b6;
+      margin-bottom: 1rem;
+    }
+
+    .btn-primary, .btn-secondary {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      background-color: #00b4d8;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 1rem;
+      transition: background 0.3s;
+      text-decoration: none;
+      font-size: 1rem;
+    }
+
+    .btn-primary:hover, .btn-secondary:hover {
+      background-color: #0077b6;
+    }
+
+    .formats {
+      font-size: 0.9rem;
+      color: #666;
+      margin-top: 0.5rem;
+    }
+
+    #file-info, #results, #error {
+      margin-top: 2rem;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .progress-container {
+      height: 10px;
+      background-color: #eee;
+      border-radius: 5px;
+      overflow: hidden;
+      margin-top: 1rem;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background-color: #00b4d8;
+      transition: width 0.3s;
+    }
+
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .result-section {
+      margin-top: 2rem;
+      padding: 1rem;
+      border-radius: 10px;
+      background: #f9f9f9;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .result-card {
+      background: #ffffff;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 1rem;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    .keywords {
+      margin-top: 0.5rem;
+    }
+
+    .keyword-tag {
+      display: inline-block;
+      background: #0077b6;
+      color: #fff;
+      padding: 0.3rem 0.6rem;
+      margin: 0.2rem;
+      border-radius: 5px;
+      font-size: 0.85rem;
+    }
+
+    .visualizations {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .viz {
+      flex: 1 1 45%;
+      text-align: center;
+    }
+
+    .viz img {
+      width: 100%;
+      max-height: 300px;
+      object-fit: contain;
+      border-radius: 10px;
+    }
+
+    .page-analysis {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .page-card {
+      background: #ffffff;
+      padding: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+    }
+
+    .error-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #c0392b;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1><i class="fas fa-file-contract"></i> Amit</h1>
+      <p>23112014</p>
+    </header>
+
+    <div class="upload-container">
+      <div id="drop-zone">
+        <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+        <h3>Drag & Drop Files Here</h3>
+        <p>or</p>
+        <input type="file" id="file-input" accept=".pdf,.docx,.txt,.jpg,.png,.pptx">
+        <label for="file-input" class="btn-primary">
+          <i class="fas fa-folder-open"></i> Choose File
+        </label>
+        <p class="formats">Supported formats: PDF, DOCX, TXT, PPTX, PNG, JPG</p>
+      </div>
+      <div id="file-info" class="hidden">
+        <h3><i class="fas fa-file"></i> <span id="filename"></span></h3>
+        <div class="progress-container">
+          <div class="progress-bar" id="progress-bar"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="results" class="hidden">
+      <div class="results-header">
+        <h2><i class="fas fa-chart-bar"></i> Analysis Results</h2>
+        <button id="download-btn" class="btn-primary">
+          <i class="fas fa-download"></i> Download Report
+        </button>
+      </div>
+      <div id="metadata-output"></div>
+    </div>
+
+    <div id="error" class="hidden">
+      <div class="error-header">
+        <i class="fas fa-exclamation-triangle"></i>
+        <h3>Processing Error</h3>
+      </div>
+      <p id="error-message"></p>
+      <button id="retry-btn" class="btn-secondary">
+        <i class="fas fa-redo"></i> Try Again
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('file-input');
+    const fileInfo = document.getElementById('file-info');
+    const fileName = document.getElementById('filename');
+    const progressBar = document.getElementById('progress-bar');
+    const resultsDiv = document.getElementById('results');
+    const outputDiv = document.getElementById('metadata-output');
+    const errorDiv = document.getElementById('error');
+    const errorMsg = document.getElementById('error-message');
+    const downloadBtn = document.getElementById('download-btn');
+    const retryBtn = document.getElementById('retry-btn');
+    let latestData = null;
+
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      dropZone.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropZone.addEventListener(eventName, () => dropZone.classList.add('highlight'), false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropZone.addEventListener(eventName, () => dropZone.classList.remove('highlight'), false);
+    });
+
+    dropZone.addEventListener('drop', e => {
+      handleFiles(e.dataTransfer.files);
+    });
+
+    fileInput.addEventListener('change', () => {
+      handleFiles(fileInput.files);
+    });
+
+    function handleFiles(files) {
+      if (!files.length) return;
+      const file = files[0];
+      fileName.textContent = file.name;
+      fileInfo.classList.remove('hidden');
+      dropZone.classList.add('hidden');
+
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += 5;
+        progressBar.style.width = `${progress}%`;
+        if (progress >= 100) {
+          clearInterval(interval);
+          processFile(file);
+        }
+      }, 100);
+    }
+
+    function processFile(file) {
+      const formData = new FormData();
+      formData.append('file', file);
+      resultsDiv.classList.add('hidden');
+      errorDiv.classList.add('hidden');
+
+      fetch('/upload', {
+        method: 'POST',
+        body: formData
+      })
+      .then(res => {
+        if (!res.ok) return res.json().then(err => { throw new Error(err.error || 'Upload failed'); });
+        return res.json();
+      })
+      .then(data => {
+        latestData = data;
+        displayResults(data);
+      })
+      .catch(err => showError(err.message));
+    }
+   function displayResults(data) {
+  let html = `
+    <div class="result-section">
+      <h3><i class="fas fa-info-circle"></i> Document Information</h3>
+      <table>
+        <tr><th>Document ID</th><td>${data.document_id}</td></tr>
+        <tr><th>Filename</th><td>${data.file_metadata.original_name}</td></tr>
+        <tr><th>File Type</th><td>${data.file_metadata.file_type}</td></tr>
+        <tr><th>File Size</th><td>${data.file_metadata.file_size}</td></tr>
+        <tr><th>Content Type</th><td>${data.file_metadata.content_type}</td></tr>
+      </table>
+    </div>
+    <div class="result-section">
+      <h3><i class="fas fa-chart-pie"></i> Content Analysis</h3>
+      <div class="result-grid">
+        <div class="result-card">
+          <h4><i class="fas fa-file-alt"></i> Summary</h4>
+          <p>${data.content_metadata.summary}</p>
+        </div>
+        <div class="result-card">
+          <h4><i class="fas fa-chart-line"></i> Readability</h4>
+          <p>Score: ${data.content_metadata.readability.toFixed(2)}</p>
+          <p>Grade Level: ${data.content_metadata.readability > 60 ? 'Easy' : 'Difficult'}</p>
+        </div>
+        <div class="result-card">
+          <h4><i class="fas fa-smile"></i> Sentiment</h4>
+          <p>Polarity: ${data.content_metadata.sentiment.polarity.toFixed(3)}</p>
+          <p>Subjectivity: ${data.content_metadata.sentiment.subjectivity.toFixed(3)}</p>
+        </div>
+      </div>
+    </div>
+    <div class="result-section">
+      <h3><i class="fas fa-tachometer-alt"></i> Processing Metrics</h3>
+      <p>Extraction Time: ${data.processing_metrics.extraction_time}</p>
+      <p>Content Size: ${data.processing_metrics.content_size}</p>
+    </div>`;
+
+  if (data.page_wise_analysis && data.page_wise_analysis.length > 0) {
+    html += `<div class="result-section">
+      <h3><i class="fas fa-copy"></i> Page-wise Analysis</h3>
+      <div class="page-analysis">`;
+    data.page_wise_analysis.forEach(p => {
+      html += `<div class="page-card">
+        <h4>Page ${p.page_number}</h4>
+        <p><strong>Summary:</strong> ${p.summary}</p>`;
+      if (Object.keys(p.entities).length > 0) {
+        html += `<p><strong>Entities:</strong></p><ul>`;
+        for (const [k, v] of Object.entries(p.entities)) {
+          html += `<li><strong>${k}:</strong> ${v.join(', ')}</li>`;
+        }
+        html += `</ul>`;
+      }
+      html += `<p><small>${p.word_count} words, ${p.char_count} characters</small></p></div>`;
+    });
+    html += `</div></div>`;
+  }
+
+  outputDiv.innerHTML = html;
+  resultsDiv.classList.remove('hidden');
+  fileInfo.classList.add('hidden');
+  dropZone.classList.remove('hidden');
+}
+
+   
+
+    function showError(msg) {
+      errorMsg.textContent = msg;
+      errorDiv.classList.remove('hidden');
+      fileInfo.classList.add('hidden');
+      dropZone.classList.remove('hidden');
+    }
+
+    downloadBtn.addEventListener('click', () => {
+      if (!latestData) return;
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(latestData, null, 2));
+      const anchor = document.createElement('a');
+      anchor.setAttribute("href", dataStr);
+      anchor.setAttribute("download", "metadata_report.json");
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+    });
+
+    retryBtn.addEventListener('click', () => {
+      errorDiv.classList.add('hidden');
+    });
+  </script>
+</body>
+</html>
